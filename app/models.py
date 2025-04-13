@@ -15,6 +15,7 @@ class Device(Base):
   
   owner_id = Column(Integer, ForeignKey("users.id"))
   owner = relationship("User", back_populates="devices")
+  history = relationship("PingHistory", back_populates="device", cascade="all, delete")
 
 class User(Base):
   __tablename__ = "users"
@@ -23,3 +24,13 @@ class User(Base):
   email = Column(String, unique=True, nullable=False)
   hashed_password = Column(String, nullable=False)
   devices = relationship("Device", back_populates="owner")
+
+class PingHistory(Base):
+  __tablename__ = "ping_history"
+  
+  id = Column(Integer, primary_key=True, index=True)
+  device_id = Column(Integer, ForeignKey("devices.id"))
+  timestamp = Column(DateTime, default=datetime.now(timezone.utc))
+  is_online = Column(Boolean)
+  
+  device = relationship("Device", back_populates="history")

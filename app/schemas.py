@@ -28,4 +28,10 @@ class UserOut(BaseModel):
   email: str
   class Config:
     orm_mode = True
-    
+
+class PingRecord(BaseModel):
+  timestamp: datetime
+  is_online: bool
+  
+  class Config:
+    orm_mode = True

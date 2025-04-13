@@ -5,13 +5,15 @@ from . import crud, models, database
 
 def ping_device():
   db: Session = database.SessionLocal()
-  devices = crud.get_device(db)
+  devices = crud.get_devices(db)
   for device in devices:
     result = ping(device.ip_address, timeout=2)
     status = result is not None
     crud.update_device_status(db, device.id, status)
+    crud.save_ping_result(db, device.id, status)
   db.close()
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(ping_device, 'interval', minutes=1)
 scheduler.start()
+
