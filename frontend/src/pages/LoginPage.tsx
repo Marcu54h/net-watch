@@ -10,20 +10,30 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // Przygotowanie danych formularza
       const formData = new URLSearchParams();
-      formData.append("username", email);
+      formData.append("username", email);  // username to wymagana nazwa parametru
       formData.append("password", password);
 
+      // Wysłanie zapytania POST
       const response = await axios.post("/token", formData, {
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
+          "Content-Type": "application/x-www-form-urlencoded",  // Właściwy nagłówek
         },
       });
 
+      // Przechowywanie tokenu w localStorage
       localStorage.setItem("token", response.data.access_token);
+
+      // Przekierowanie po udanym logowaniu
       navigate("/devices");
-    } catch (error) {
-      alert("Nieprawidłowy login lub hasło.");
+    } catch (error: any) {
+      // Obsługa błędów
+      if (error.response && error.response.status === 400) {
+        alert("Nieprawidłowy login lub hasło.");
+      } else {
+        alert("Wystąpił błąd. Spróbuj ponownie.");
+      }
     }
   };
 
@@ -37,6 +47,7 @@ export default function LoginPage() {
           value={email}
           onChange={e => setEmail(e.target.value)}
           className="w-full mb-3 p-2 border rounded"
+          required
         />
         <input
           type="password"
@@ -44,6 +55,7 @@ export default function LoginPage() {
           value={password}
           onChange={e => setPassword(e.target.value)}
           className="w-full mb-3 p-2 border rounded"
+          required
         />
         <button
           type="submit"

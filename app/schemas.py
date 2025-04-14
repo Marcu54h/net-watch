@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from typing import Optional
 from datetime import datetime
 
@@ -16,22 +16,22 @@ class DeviceOut(BaseModel):
   last_checked: datetime
   
   class Config:
-    orm_mode = True
+    from_attributes = True
 
 # ==== User ====
 class UserCreate(BaseModel):
-  email: str
+  email: EmailStr
   password: str
 
 class UserOut(BaseModel):
   id: int
-  email: str
+  email: EmailStr
   class Config:
-    orm_mode = True
+    from_attributes = True
 
 class PingRecord(BaseModel):
   timestamp: datetime
   is_online: bool
   
   class Config:
-    orm_mode = True
+    from_attributes = True

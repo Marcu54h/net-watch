@@ -10,6 +10,14 @@ app.include_router(user_router)
 
 models.Base.metadata.create_all(bind=database.engine)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # <-- frontend Vite działa tu domyślnie
+    allow_credentials=True,
+    allow_methods=["*"],  # <-- pozwól na wszystkie metody, łącznie z OPTIONS
+    allow_headers=["*"],  # <-- pozwól na wszystkie nagłówki
+)
+
 # Dependency
 def get_db():
     db = database.SessionLocal()
