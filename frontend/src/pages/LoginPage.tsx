@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { login } from "../api/auth";
 import { useNavigate } from "react-router-dom";
+import axios from "../api/axios";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -10,22 +10,47 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await login(email, password);
+      const formData = new URLSearchParams();
+      formData.append("username", email);
+      formData.append("password", password);
+
+      const response = await axios.post("/token", formData, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      });
+
+      localStorage.setItem("token", response.data.access_token);
       navigate("/devices");
-    } catch {
-      alert("Błąd logowania");
+    } catch (error) {
+      alert("Nieprawidłowy login lub hasło.");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <form onSubmit={handleLogin} className="bg-white p-8 shadow-md rounded max-w-sm w-full">
-        <h2 className="text-xl font-bold mb-4">Logowanie</h2>
-        <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email"
-          className="border p-2 w-full mb-2" />
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Hasło"
-          className="border p-2 w-full mb-4" />
-        <button type="submit" className="bg-blue-500 text-white w-full py-2 rounded">Zaloguj</button>
+    <div className="flex justify-center items-center h-screen bg-gray-100">
+      <form onSubmit={handleLogin} className="bg-white p-6 rounded shadow-md w-80">
+        <h2 className="text-2xl font-bold mb-4">Logowanie</h2>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          className="w-full mb-3 p-2 border rounded"
+        />
+        <input
+          type="password"
+          placeholder="Hasło"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          className="w-full mb-3 p-2 border rounded"
+        />
+        <button
+          type="submit"
+          className="bg-blue-500 text-white w-full py-2 rounded hover:bg-blue-600"
+        >
+          Zaloguj się
+        </button>
       </form>
     </div>
   );
