@@ -13,13 +13,14 @@ export default function RegisterPage() {
       await axios.post("/register", {
         email,
         password,
-      });
+      }).then(response => (console.log(response.data)));
 
       // Możesz przekierować na stronę logowania po udanej rejestracji
       alert("Rejestracja zakończona sukcesem. Zaloguj się teraz.");
       navigate("/login");
     } catch (error: any) {
       // Obsługa błędów w przypadku nieudanej rejestracji
+      console.error("Błąd rejestracji:", error);
       alert("Błąd rejestracji. Spróbuj ponownie.");
     }
   };
