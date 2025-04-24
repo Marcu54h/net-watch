@@ -4,7 +4,8 @@ from passlib.context import CryptContext
 from fastapi import HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
-from . import models, database
+from . import models
+from .database import get_db
 
 SECRET_KEY = "your_secret_key_here"
 ALGORITHM = "HS256"
@@ -25,7 +26,7 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
   to_encode.update({"exp": expire})
   return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(database.SessionLocal)):
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
   try:
     payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     user_id = payload.get("sub")

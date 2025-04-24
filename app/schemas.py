@@ -6,6 +6,7 @@ class DeviceCreate(BaseModel):
   name: str
   ip_address: str
   description: Optional[str] = None
+  owner_id: int
 
 class DeviceOut(BaseModel):
   id: int

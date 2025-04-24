@@ -4,14 +4,20 @@ from sqlalchemy.orm import Session
 from . import crud, models, database
 
 def ping_device():
-  db: Session = database.SessionLocal()
-  devices = crud.get_devices(db)
-  for device in devices:
-    result = ping(device.ip_address, timeout=2)
-    status = result is not None
-    crud.update_device_status(db, device.id, status)
-    crud.save_ping_result(db, device.id, status)
-  db.close()
+    db: Session = database.SessionLocal()
+    devices = crud.get_devices(db)
+
+    for device in devices:
+        result = ping(device.ip_address, timeout=2)
+        current_status = result is not None
+
+        # Tylko jeśli status się zmienił
+        if current_status != device.is_online:
+            crud.update_device_status(db, device.id, current_status)
+            crud.save_ping_result(db, device.id, current_status)
+
+    db.close()
+
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(ping_device, 'interval', minutes=1)

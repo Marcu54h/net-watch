@@ -32,11 +32,16 @@ export default function DeviceDetailPage() {
   const { id } = useParams();
   const [device, setDevice] = useState<Device | null>(null);
   const [history, setHistory] = useState<PingRecord[]>([]);
+  const sampledHistory = history.filter((_, index) => index % 10 === 0);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+useEffect(() => {
+    // const interval = setInterval(() => {
+    //   fetchData();
+    // }, 30000); // co 30 sekund
+  fetchData();
+  // return () => clearInterval(interval); // czyścimy przy odmontowaniu
+}, []);
 
   const fetchData = async () => {
     setLoading(true);
@@ -77,12 +82,12 @@ export default function DeviceDetailPage() {
   const uptime = total ? ((online / total) * 100).toFixed(1) : "0";
 
   // chart data
-  const chartData = {
-    labels: history.map((h) => new Date(h.timestamp).toLocaleTimeString()),
-    datasets: [
-      {
-        label: "Status",
-        data: history.map((h) => (h.status ? 1 : 0)),
+const chartData = {
+  labels: sampledHistory.map((h) =>new Date(h.timestamp).toLocaleTimeString("pl-PL")),
+  datasets: [
+    {
+      label: "Status",
+      data: sampledHistory.map((h) => (h.status ? 1 : 0)),
         borderColor: "rgb(75,192,192)",
         tension: 0.1,
         fill: false,
@@ -99,6 +104,15 @@ export default function DeviceDetailPage() {
         min: 0,
         max: 1,
         stepSize: 1,
+      },
+    },
+    plugins: {
+      tooltip: {
+        callbacks: {
+          label: function (context: any) {
+            return context.raw === 1 ? "Online" : "Offline";
+          },
+        },
       },
     },
   };
